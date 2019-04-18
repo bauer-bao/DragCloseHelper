@@ -1,0 +1,99 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.novoda.bintray-release'
+
+//github + jitpack发布需要参数
+group = 'com.github.bauer-bao'
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.novoda:bintray-release:0.9'
+    }
+}
+
+android {
+    compileSdkVersion 28
+
+    defaultConfig {
+        minSdkVersion 19
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility = '1.8'
+        targetCompatibility = '1.8'
+    }
+
+    lintOptions {
+        abortOnError false
+        checkReleaseBuilds false
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    api 'androidx.appcompat:appcompat:1.1.0-alpha04'
+}
+
+
+//以下为jcenter发布的代码
+
+// 生成jar包的task，不需要修改。因为目前source的包是没有混淆的，因此上传忽略掉source.jar。但是第一次上传的时候必须上传，可以审核之后再手动删除
+//task sourcesJar(type: Jar) {
+//    classifier = 'sources'
+//    from android.sourceSets.main.java.srcDirs
+//}
+// 生成jarDoc的task，不需要修改。
+//task javadoc(type: Javadoc) {
+//    source = android.sourceSets.main.java.srcDirs
+//    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+//    // destinationDir = file("../javadoc/")
+//    failOnError false // 忽略注释语法错误，如果用jdk1.8你的注释写的不规范就编译不过。
+//}
+//// 生成javaDoc的jar，不需要修改。
+//task javadocJar(type: Jar, dependsOn: javadoc) {
+//    classifier = 'javadoc'
+//    from javadoc.destinationDir
+//}
+////拷贝javadoc文件
+//task copyDoc(type: Copy) {
+//    from "${buildDir}/docs/"
+//    into "docs"
+//}
+//artifacts {
+//    archives javadocJar
+//    archives sourcesJar
+//}
+//发布脚本命令  ./gradlew clean build releaseAndroidSourcesJar generatePomFileForReleasePublication bintrayUpload -PbintrayUser=bauer -PbintrayKey=bccc93fdbf3f7ec33c1b9ce52d2c4157c2ba9d36 -PdryRun=false
+//发布脚本命令  ./gradlew clean build generatePomFileForReleasePublication bintrayUpload -PbintrayUser=bauer -PbintrayKey=bccc93fdbf3f7ec33c1b9ce52d2c4157c2ba9d36 -PdryRun=false
+//发布脚本命令  ./gradlew clean build generatePomFileForReleasePublication   ./gradlew bintrayUpload   建议把上传命令单独执行，不然很有可能优先执行上传任务
+publish {
+    //用户id
+    userOrg = 'bauer'
+    //repo
+    repoName = 'android'
+    //包名
+    groupId = 'com.dragclosehelper.library'
+    //bintary的package名
+    artifactId = 'dragclosehelper'
+    //版本号
+    publishVersion = '0.0.1'
+    //描述
+    desc = 'An android library for view or view group to drag close'
+    //账号
+    bintrayUser = 'bauer'
+    //key
+    bintrayKey = 'bccc93fdbf3f7ec33c1b9ce52d2c4157c2ba9d36'
+    dryRun = false
+}
