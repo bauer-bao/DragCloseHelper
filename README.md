@@ -1,5 +1,9 @@
 # DragCloseHelper
+
+[![](https://jitpack.io/v/bauer-bao/dragclosehelper.svg)](https://jitpack.io/#bauer-bao/dragclosehelper)
+
 使用步骤：
+
 1.activity主题设为透明
 
         <item name="android:windowIsTranslucent">true</item>
