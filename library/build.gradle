@@ -4,6 +4,13 @@ apply plugin: 'com.github.dcendents.android-maven'
 //github + jitpack发布需要参数
 group = 'com.github.bauer-bao'
 
+repositories {
+    mavenCentral()
+    google()
+    jcenter()
+    maven { url "https://jitpack.io" }
+}
+
 android {
     compileSdkVersion 28
 
@@ -16,13 +23,16 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
     compileOptions {
         sourceCompatibility = '1.8'
         targetCompatibility = '1.8'
+    }
+    lintOptions {
+        abortOnError false
     }
 }
 
