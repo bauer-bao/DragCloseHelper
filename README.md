@@ -2,7 +2,16 @@
 
 [![](https://jitpack.io/v/bauer-bao/dragclosehelper.svg)](https://jitpack.io/#bauer-bao/dragclosehelper)
 
-使用步骤：
+## 效果图：
+
+## 使用步骤：
+
+   ![image](https://github.com/bauer-bao/DragCloseHelper/blob/master/screenshoots/1.gif)
+   ![image](https://github.com/bauer-bao/DragCloseHelper/blob/master/screenshoots/2.gif)
+
+0.依赖
+
+        implementation 'com.github.bauer-bao:dragclosehelper:0.0.7'
 
 1.activity主题设为透明
 
@@ -13,9 +22,9 @@
 3.如果是共享元素启动的页面，需要如下设置（强烈建议和共享元素一起使用，否则是没有灵魂的）
 
         dragCloseHelper.setShareElementMode(true);
-4.设置需要进行拖拽的view/viewGroup，以及背景viewGroup（必须要设置背景色）
+4.设置需要进行拖拽的View/ViewGroup，以及背景ViewGroup（必须要设置背景色）
 
-        dragCloseHelper.setDragCloseViews(previewImgRootRl, previewImgIv);
+        dragCloseHelper.setDragCloseViews(parentV, childV);
 5.设置监听
 
         dragCloseHelper.setDragCloseListener(new DragCloseHelper.DragCloseListener() {
