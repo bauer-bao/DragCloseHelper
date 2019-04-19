@@ -1,14 +1,13 @@
 package com.dragclosehelper.example;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.widget.ImageView;
 
 import com.dragclosehelper.library.DragCloseHelper;
-
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 
 /**
  * @author bauer on 2019/4/18.

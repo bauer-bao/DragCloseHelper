@@ -5,8 +5,7 @@ import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
 
-import androidx.annotation.FloatRange;
-
+import android.support.annotation.FloatRange;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
