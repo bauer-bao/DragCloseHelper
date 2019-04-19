@@ -2,12 +2,12 @@
 
 [![](https://jitpack.io/v/bauer-bao/dragclosehelper.svg)](https://jitpack.io/#bauer-bao/dragclosehelper)
 
-## 效果图：
-
-## 使用步骤：
+## 效果图：加载略慢，见谅
 
    ![image](https://github.com/bauer-bao/DragCloseHelper/blob/master/screenshoots/1.gif)
    ![image](https://github.com/bauer-bao/DragCloseHelper/blob/master/screenshoots/2.gif)
+
+## 使用步骤：
 
 0.依赖
 
