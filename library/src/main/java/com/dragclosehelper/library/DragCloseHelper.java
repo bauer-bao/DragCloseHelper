@@ -223,6 +223,13 @@ public class DragCloseHelper {
                     isSwipingToClose = false;
                     return true;
                 }
+            } else if (event.getAction() == MotionEvent.ACTION_CANCEL) {
+                //取消事件
+                if (isSwipingToClose) {
+                    resetCallBackAnimation();
+                    isSwipingToClose = false;
+                    return true;
+                }
             }
         }
         return false;
