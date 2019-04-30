@@ -17,7 +17,7 @@
         			maven { url 'https://jitpack.io' }
         		}
         	}
-        implementation 'com.github.bauer-bao:dragclosehelper:0.0.7'
+        implementation 'com.github.bauer-bao:dragclosehelper:0.0.8'
 
 1.activity主题设为透明
 
