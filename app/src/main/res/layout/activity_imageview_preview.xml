@@ -7,11 +7,10 @@
     android:background="#000000"
     android:orientation="vertical">
 
-    <ImageView
-        android:id="@+id/iv_preview_iv"
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/iv_preview_vp"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:src="@drawable/ic_launcher_background"
         android:transitionName="share_photo"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"

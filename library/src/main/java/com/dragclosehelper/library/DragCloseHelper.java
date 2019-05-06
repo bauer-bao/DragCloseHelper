@@ -167,7 +167,8 @@ public class DragCloseHelper {
                 }
                 float currentY = event.getY();
                 float currentX = event.getX();
-                if (isSwipingToClose || Math.abs(currentY - mLastY) > 2 * viewConfiguration.getScaledTouchSlop()) {
+                if (isSwipingToClose ||
+                        (Math.abs(currentY - mLastY) > 2 * viewConfiguration.getScaledTouchSlop() && Math.abs(currentY - mLastY) > Math.abs(currentX - mLastX) * 1.5)) {
                     //已经触发或者开始触发，更新view
                     mLastY = currentY;
                     mLastX = currentX;

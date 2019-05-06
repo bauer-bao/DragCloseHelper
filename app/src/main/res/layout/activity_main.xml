@@ -8,13 +8,39 @@
     tools:context=".MainActivity">
 
     <ImageView
-        android:id="@+id/main_iv"
-        android:layout_width="wrap_content"
+        android:id="@+id/main_iv1"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_launcher_background"
+        android:adjustViewBounds="true"
+        android:src="@drawable/img1"
         android:transitionName="share_photo"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/main_iv2"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/main_iv2"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:src="@drawable/img2"
+
+        android:transitionName="share_photo"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/main_iv1"
+        app:layout_constraintRight_toLeftOf="@+id/main_iv3"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/main_iv3"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:src="@drawable/img3"
+        android:transitionName="share_photo"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/main_iv2"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
