@@ -4,8 +4,10 @@
 
 ## 效果图：加载略慢，见谅
 
+1.demo效果
+   ![image](https://github.com/bauer-bao/DragCloseHelper/blob/master/screenshoots/3.gif)
+2.视频效果，非demo
    ![image](https://github.com/bauer-bao/DragCloseHelper/blob/master/screenshoots/1.gif)
-   ![image](https://github.com/bauer-bao/DragCloseHelper/blob/master/screenshoots/2.gif)
 
 ## 使用步骤：
 
@@ -17,7 +19,7 @@
         			maven { url 'https://jitpack.io' }
         		}
         	}
-        implementation 'com.github.bauer-bao:dragclosehelper:0.0.8'
+        implementation 'com.github.bauer-bao:dragclosehelper:0.0.9'
 
 1.activity主题设为透明
 

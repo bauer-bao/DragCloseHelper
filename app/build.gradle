@@ -30,6 +30,6 @@ dependencies {
     androidTestImplementation 'androidx.test:runner:1.2.0-alpha03'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0-alpha03'
     implementation 'com.hwangjr.rxbus:rxbus:2.0.0'
-//    implementation 'com.github.bauer-bao:dragclosehelper:0.0.8'
+//    implementation 'com.github.bauer-bao:dragclosehelper:0.0.9'
     implementation project(':library')
 }
