@@ -5,13 +5,13 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ImageView;
 
 import com.dragclosehelper.library.DragCloseHelper;
@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * @author bauer on 2019/4/18.
  */
-public class ImageViewPreviewActivity extends AppCompatActivity {
+public class ImageViewPreviewActivity extends BaseActivity {
     private ConstraintLayout ivPreviewCl;
     private ViewPager viewPager;
 
@@ -39,6 +39,13 @@ public class ImageViewPreviewActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_imageview_preview);
+
+        //如果在拖拽返回关闭的时候，导航栏上又出现拖拽的view的情况，就用以下代码。就和微信的表现形式一样
+        //隐藏状态栏
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        //透明导航栏
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+
         ivPreviewCl = findViewById(R.id.iv_preview_cl);
         viewPager = findViewById(R.id.iv_preview_vp);
 

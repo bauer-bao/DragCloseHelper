@@ -15,9 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 import androidx.core.app.ActivityOptionsCompat;
-import androidx.appcompat.app.AppCompatActivity;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends BaseActivity implements View.OnClickListener {
     private ImageView iv1;
     private ImageView iv2;
     private ImageView iv3;
