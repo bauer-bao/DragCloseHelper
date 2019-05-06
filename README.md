@@ -5,8 +5,11 @@
 ## 效果图：加载略慢，见谅
 
 1.demo效果
+
    ![image](https://github.com/bauer-bao/DragCloseHelper/blob/master/screenshoots/3.gif)
+
 2.视频效果，非demo
+
    ![image](https://github.com/bauer-bao/DragCloseHelper/blob/master/screenshoots/1.gif)
 
 ## 使用步骤：
