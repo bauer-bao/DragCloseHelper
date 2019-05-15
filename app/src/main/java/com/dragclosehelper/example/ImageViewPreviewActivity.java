@@ -1,5 +1,9 @@
 package com.dragclosehelper.example;
 
+import android.app.SharedElementCallback;
+import android.content.Context;
+import android.graphics.Matrix;
+import android.graphics.RectF;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -8,6 +12,8 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import android.os.Parcelable;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +25,7 @@ import com.hwangjr.rxbus.RxBus;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author bauer on 2019/4/18.
@@ -127,6 +134,7 @@ public class ImageViewPreviewActivity extends BaseActivity {
             @Override
             public void dragStart() {
                 //拖拽开始。可以在此额外处理一些逻辑
+                RxBus.get().post("updateView", index);
             }
 
             @Override
@@ -145,6 +153,50 @@ public class ImageViewPreviewActivity extends BaseActivity {
                 if (isShareElementMode) {
                     onBackPressed();
                 }
+            }
+        });
+
+        setEnterSharedElementCallback(new SharedElementCallback() {
+            @Override
+            public void onSharedElementStart(List<String> sharedElementNames, List<View> sharedElements, List<View> sharedElementSnapshots) {
+                super.onSharedElementStart(sharedElementNames, sharedElements, sharedElementSnapshots);
+                Log.d("test enter b", "onSharedElementStart");
+            }
+
+            @Override
+            public void onSharedElementEnd(List<String> sharedElementNames, List<View> sharedElements, List<View> sharedElementSnapshots) {
+                super.onSharedElementEnd(sharedElementNames, sharedElements, sharedElementSnapshots);
+                Log.d("test enter b", "onSharedElementEnd");
+            }
+
+            @Override
+            public void onRejectSharedElements(List<View> rejectedSharedElements) {
+                super.onRejectSharedElements(rejectedSharedElements);
+                Log.d("test enter b", "onRejectSharedElements");
+            }
+
+            @Override
+            public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
+                super.onMapSharedElements(names, sharedElements);
+                Log.d("test enter b", "onMapSharedElements");
+            }
+
+            @Override
+            public Parcelable onCaptureSharedElementSnapshot(View sharedElement, Matrix viewToGlobalMatrix, RectF screenBounds) {
+                Log.d("test enter b", "onCaptureSharedElementSnapshot");
+                return super.onCaptureSharedElementSnapshot(sharedElement, viewToGlobalMatrix, screenBounds);
+            }
+
+            @Override
+            public View onCreateSnapshotView(Context context, Parcelable snapshot) {
+                Log.d("test enter b", "onCreateSnapshotView");
+                return super.onCreateSnapshotView(context, snapshot);
+            }
+
+            @Override
+            public void onSharedElementsArrived(List<String> sharedElementNames, List<View> sharedElements, OnSharedElementsReadyListener listener) {
+                Log.d("test enter b", "onSharedElementsArrived");
+                super.onSharedElementsArrived(sharedElementNames, sharedElements, listener);
             }
         });
     }
