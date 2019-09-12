@@ -70,15 +70,15 @@
         });
 6.处理touch事件
 
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent event) {
-        if (dragCloseHelper.handleEvent(event)) {
-            return true;
-        } else {
-            return super.dispatchTouchEvent(event);
+        @Override
+        public boolean dispatchTouchEvent(MotionEvent event) {
+            if (dragCloseHelper.handleEvent(event)) {
+                return true;
+            } else {
+                return super.dispatchTouchEvent(event);
+            }
         }
-    }
 7.可以自定义最大拖拽距离和最小缩放尺寸
 
-    setMaxExitY(int maxExitY)
-    setMinScale(@FloatRange(from = 0.1f, to = 1.0f) float minScale)
+        setMaxExitY(int maxExitY)
+        setMinScale(@FloatRange(from = 0.1f, to = 1.0f) float minScale)

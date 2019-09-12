@@ -32,4 +32,5 @@ dependencies {
     implementation 'com.hwangjr.rxbus:rxbus:2.0.0'
 //    implementation 'com.github.bauer-bao:dragclosehelper:0.0.9'
     implementation project(':library')
+    implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.34'
 }

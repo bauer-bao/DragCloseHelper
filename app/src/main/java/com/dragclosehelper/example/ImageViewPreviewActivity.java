@@ -2,8 +2,6 @@ package com.dragclosehelper.example;
 
 import android.app.SharedElementCallback;
 import android.content.Context;
-import android.graphics.Matrix;
-import android.graphics.RectF;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -36,6 +34,8 @@ public class ImageViewPreviewActivity extends BaseActivity {
 
     private List<View> list;
 
+    private ArrayList<Integer> photoList;
+
     private DragCloseHelper dragCloseHelper;
 
     private int index;
@@ -57,25 +57,16 @@ public class ImageViewPreviewActivity extends BaseActivity {
         viewPager = findViewById(R.id.iv_preview_vp);
 
         index = getIntent().getIntExtra("index", 0);
+        photoList = (ArrayList<Integer>) getIntent().getSerializableExtra("photos");
 
         list = new ArrayList<>();
-        ImageView imageView1 = new ImageView(this);
-        imageView1.setImageResource(R.drawable.img1);
-        imageView1.setAdjustViewBounds(true);
-        imageView1.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        list.add(imageView1);
-
-        ImageView imageView2 = new ImageView(this);
-        imageView2.setImageResource(R.drawable.img2);
-        imageView2.setAdjustViewBounds(true);
-        imageView2.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        list.add(imageView2);
-
-        ImageView imageView3 = new ImageView(this);
-        imageView3.setImageResource(R.drawable.img3);
-        imageView3.setAdjustViewBounds(true);
-        imageView3.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        list.add(imageView3);
+        for (int i = 0; i < photoList.size(); i++) {
+            ImageView imageView = new ImageView(this);
+            imageView.setImageResource(photoList.get(i));
+            imageView.setAdjustViewBounds(true);
+            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+            list.add(imageView);
+        }
 
         viewPager.setAdapter(new PagerAdapter() {
             @Override
@@ -109,6 +100,7 @@ public class ImageViewPreviewActivity extends BaseActivity {
 
             @Override
             public void onPageSelected(int position) {
+                //每次页面变化，都要通知上一个页面更新共享元素的键值对
                 RxBus.get().post("updateIndex", position);
             }
 
@@ -134,6 +126,7 @@ public class ImageViewPreviewActivity extends BaseActivity {
             @Override
             public void dragStart() {
                 //拖拽开始。可以在此额外处理一些逻辑
+                //此处通知之前点击的view重新显示出来
                 RxBus.get().post("updateView", index);
             }
 
@@ -160,41 +153,48 @@ public class ImageViewPreviewActivity extends BaseActivity {
             @Override
             public void onSharedElementStart(List<String> sharedElementNames, List<View> sharedElements, List<View> sharedElementSnapshots) {
                 super.onSharedElementStart(sharedElementNames, sharedElements, sharedElementSnapshots);
+                //sharedElements 是本页面共享元素的view   sharedElementSnapshots是本页面真正执行动画的view
                 Log.d("test enter b", "onSharedElementStart");
             }
 
             @Override
             public void onSharedElementEnd(List<String> sharedElementNames, List<View> sharedElements, List<View> sharedElementSnapshots) {
                 super.onSharedElementEnd(sharedElementNames, sharedElements, sharedElementSnapshots);
+                //sharedElements 是本页面共享元素的view   sharedElementSnapshots是本页面真正执行动画的view
                 Log.d("test enter b", "onSharedElementEnd");
             }
 
             @Override
             public void onRejectSharedElements(List<View> rejectedSharedElements) {
                 super.onRejectSharedElements(rejectedSharedElements);
+                //屏蔽的view
                 Log.d("test enter b", "onRejectSharedElements");
             }
 
             @Override
             public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
                 super.onMapSharedElements(names, sharedElements);
+                //sharedElements 是本页面共享元素的view
                 Log.d("test enter b", "onMapSharedElements");
             }
 
-            @Override
-            public Parcelable onCaptureSharedElementSnapshot(View sharedElement, Matrix viewToGlobalMatrix, RectF screenBounds) {
-                Log.d("test enter b", "onCaptureSharedElementSnapshot");
-                return super.onCaptureSharedElementSnapshot(sharedElement, viewToGlobalMatrix, screenBounds);
-            }
+//            @Override
+//            public Parcelable onCaptureSharedElementSnapshot(View sharedElement, Matrix viewToGlobalMatrix, RectF screenBounds) {
+//                Log.d("test enter b", "onCaptureSharedElementSnapshot");
+//                return super.onCaptureSharedElementSnapshot(sharedElement, viewToGlobalMatrix, screenBounds);
+//            }
 
             @Override
             public View onCreateSnapshotView(Context context, Parcelable snapshot) {
+                //新的iv执行动画的真正iv
                 Log.d("test enter b", "onCreateSnapshotView");
-                return super.onCreateSnapshotView(context, snapshot);
+                View view = super.onCreateSnapshotView(context, snapshot);
+                return view;
             }
 
             @Override
             public void onSharedElementsArrived(List<String> sharedElementNames, List<View> sharedElements, OnSharedElementsReadyListener listener) {
+                //sharedElements 是本页面共享元素的view
                 Log.d("test enter b", "onSharedElementsArrived");
                 super.onSharedElementsArrived(sharedElementNames, sharedElements, listener);
             }
