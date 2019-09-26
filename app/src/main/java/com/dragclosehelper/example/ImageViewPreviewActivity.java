@@ -19,6 +19,7 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 
 import com.dragclosehelper.library.DragCloseHelper;
+import com.github.chrisbanes.photoview.PhotoView;
 import com.hwangjr.rxbus.RxBus;
 
 import java.util.ArrayList;
@@ -61,7 +62,7 @@ public class ImageViewPreviewActivity extends BaseActivity {
 
         list = new ArrayList<>();
         for (int i = 0; i < photoList.size(); i++) {
-            ImageView imageView = new ImageView(this);
+            PhotoView imageView = new PhotoView(this);
             imageView.setImageResource(photoList.get(i));
             imageView.setAdjustViewBounds(true);
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
@@ -147,6 +148,10 @@ public class ImageViewPreviewActivity extends BaseActivity {
                     onBackPressed();
                 }
             }
+        });
+        dragCloseHelper.setClickListener((view, isLongClick) -> {
+            int currentIndex = ((ViewPager) view).getCurrentItem();
+            Log.d("test", currentIndex + (isLongClick ? "被长按" : "被点击"));
         });
 
         setEnterSharedElementCallback(new SharedElementCallback() {

@@ -65,9 +65,17 @@ public class DragCloseHelper {
     private View parentV, childV;
 
     private DragCloseListener dragCloseListener;
+    private ClickListener clickListener;
     private Context mContext;
 
     private boolean isDebug = false;
+
+    /**
+     * 按的状态
+     */
+    private boolean isPress = false;
+    private boolean longClickPerform = false;
+    private LongClickRunnable longClickRunnable;
 
     public DragCloseHelper(Context mContext) {
         this.mContext = mContext;
@@ -76,6 +84,10 @@ public class DragCloseHelper {
 
     public void setDragCloseListener(DragCloseListener dragCloseListener) {
         this.dragCloseListener = dragCloseListener;
+    }
+
+    public void setClickListener(ClickListener clickListener) {
+        this.clickListener = clickListener;
     }
 
     /**
@@ -126,6 +138,19 @@ public class DragCloseHelper {
     }
 
     /**
+     * 开始对长按事件计时
+     */
+    private void checkForLongClick() {
+        longClickPerform = false;
+
+        if (longClickRunnable == null) {
+            longClickRunnable = new LongClickRunnable();
+        }
+
+        parentV.postDelayed(longClickRunnable, ViewConfiguration.getLongPressTimeout());
+    }
+
+    /**
      * 处理touch事件
      *
      * @param event
@@ -141,6 +166,10 @@ public class DragCloseHelper {
             //不拦截
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 log("action down--->");
+                //开始按
+                isPress = true;
+                //开始延迟
+                checkForLongClick();
                 //初始化数据
                 lastPointerId = event.getPointerId(0);
                 reset(event);
@@ -173,6 +202,12 @@ public class DragCloseHelper {
                     mLastY = currentY;
                     mLastX = currentX;
                     log("action move---> start close");
+
+                    //一旦移动，按则取消
+                    isPress = false;
+                    longClickPerform = false;
+                    parentV.removeCallbacks(longClickRunnable);
+
                     float currentRawY = event.getRawY();
                     float currentRawX = event.getRawX();
                     if (!isSwipingToClose) {
@@ -206,6 +241,19 @@ public class DragCloseHelper {
                 }
             } else if (event.getAction() == MotionEvent.ACTION_UP) {
                 log("action up--->" + isSwipingToClose);
+                if (isPress) {
+                    if (!longClickPerform) {
+                        //长按没有处理，开始执行单击
+                        parentV.removeCallbacks(longClickRunnable);
+
+                        if (clickListener != null) {
+                            clickListener.onClick(childV, false);
+                        }
+                    }
+                    //结束了按的状态
+                    isPress = false;
+                }
+
                 //手指抬起事件
                 if (isSwipingToClose) {
                     if (mCurrentTranslationY > maxExitY) {
@@ -226,6 +274,9 @@ public class DragCloseHelper {
                 }
             } else if (event.getAction() == MotionEvent.ACTION_CANCEL) {
                 //取消事件
+                //结束了按的状态
+                isPress = false;
+                longClickPerform = false;
                 if (isSwipingToClose) {
                     resetCallBackAnimation();
                     isSwipingToClose = false;
@@ -366,6 +417,20 @@ public class DragCloseHelper {
         }
     }
 
+    /**
+     * 处理长按事件
+     */
+    private final class LongClickRunnable implements Runnable {
+
+        @Override
+        public void run() {
+            if (isPress && clickListener != null) {
+                clickListener.onClick(childV, true);
+                longClickPerform = true;
+            }
+        }
+    }
+
     public interface DragCloseListener {
         /**
          * 是否有拦截
@@ -397,5 +462,12 @@ public class DragCloseHelper {
          * @param isShareElementMode
          */
         void dragClose(boolean isShareElementMode);
+    }
+
+    public interface ClickListener {
+        /**
+         * 点击事件
+         */
+        void onClick(View view, boolean isLongClick);
     }
 }

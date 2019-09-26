@@ -33,4 +33,5 @@ dependencies {
 //    implementation 'com.github.bauer-bao:dragclosehelper:0.0.9'
     implementation project(':library')
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.34'
+    implementation 'com.github.chrisbanes:PhotoView:2.3.0'
 }

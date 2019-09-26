@@ -2,7 +2,7 @@
 
 [![](https://jitpack.io/v/bauer-bao/dragclosehelper.svg)](https://jitpack.io/#bauer-bao/dragclosehelper)
 
-## 效果图：加载略慢，见谅
+## 效果图：
 
 1.demo效果
 
@@ -66,6 +66,13 @@
                 if (isShareElementMode) {
                     onBackPressed();
                 }
+            }
+        });
+
+        dragCloseHelper.setClickListener(new DragCloseHelper.ClickListener() {
+            @Override
+            public void onClick(View view, boolean isLongClick) {
+                 //isLongClick 是否为长按事件。建议长按使用库中此方法，单击不建议使用（建议直接写在宿主代码中）。
             }
         });
 6.处理touch事件
