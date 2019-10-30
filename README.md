@@ -98,29 +98,24 @@
 2.滑动关闭的过程中（手指脱离屏幕），view会显示在虚拟导航栏上
 
     参照微信，使用如下代码
-
-        //隐藏状态栏
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        //透明导航栏
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+    //隐藏状态栏
+    getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+    //透明导航栏
+    getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
 
 3.滑动关闭的过程中（手机没有脱离屏幕），上一个页面设置共享动画的view显示空白
 
     方法a.在滑动开始的事件回调中（dragStart方法），使用rxbus/eventbus通知上一个页面，将目标的view的alpha设为1（view.setAlpha(1f)）
-
     方法b.见常见问题7
 
 4.滑动关闭的过程中（手机脱离屏幕，view开始返回到上个页面），上一个页面设置共享动画的view显示空白
 
     方法a.在上一页面设置setExitSharedElementCallback监听，并在onCaptureSharedElementSnapshot回调中将sharedElement的alpha设为1，代码如下
-
-        @Override
-        public Parcelable onCaptureSharedElementSnapshot(View sharedElement, Matrix viewToGlobalMatrix, RectF screenBounds) {
-            Log.d("test exit a", "onCaptureSharedElementSnapshot");
-            sharedElement.setAlpha(1f);
-            return super.onCaptureSharedElementSnapshot(sharedElement, viewToGlobalMatrix, screenBounds);
-        }
-
+    @Override
+    public Parcelable onCaptureSharedElementSnapshot(View sharedElement, Matrix viewToGlobalMatrix, RectF screenBounds) {
+        sharedElement.setAlpha(1f);
+        return super.onCaptureSharedElementSnapshot(sharedElement, viewToGlobalMatrix, screenBounds);
+    }
     方法b.见常见问题7
 
 5.虚拟键盘显示或者隐藏之后，共享动画有异常，其中肯定有段黑屏的过程
@@ -130,29 +125,22 @@
 6.类似微信朋友圈，点击图片预览，左右切换图片之后返回，动画不匹配
 
     步骤1.在图片预览，切换图片之后，需要将最新的索引值通知上一页面
-
     步骤2.上一页面接受到通知之后，更新索引值
-
     步骤3.在onMapSharedElements回调中更新Map，代码如下
-
-        @Override
-        public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
-            super.onMapSharedElements(names, sharedElements);
-            //sharedElements 本页面指定共享元素动画的view
-            Log.d("test exit a", "onMapSharedElements");
-            //更新共享元素键值对
-            View view = adapter.getViewByPosition(photosRv, updateIndex, R.id.rv_item_fake_iv);
-            if (view != null) {
-                sharedElements.put("share_photo", view);
-            }
+    @Override
+    public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
+        super.onMapSharedElements(names, sharedElements);
+        //更新共享元素键值对
+        View view = adapter.getViewByPosition(photosRv, updateIndex, R.id.rv_item_fake_iv);
+        if (view != null) {
+            sharedElements.put("share_photo", view);
         }
+    }
 
 7.在滑动返回的过程中，出现种种的view显示空白的问题，可以统统使用此答案
 
     步骤1.在布局文件中，在目标view的底下，新建一个同样的fakeView
-
     步骤2.将目标view的共享动画，全部转移设置到fakeView上
-
     效果和微信朋友圈类似，不需要设置上面问题3和问题4的代码
 
 ## 更新日志：
@@ -163,7 +151,6 @@ V0.0.7
 V0.0.8
 
     1.添加对cancel的处理
-
     2.appcompat依赖修改为compileOnly
 
 V0.0.9
@@ -177,5 +164,4 @@ V0.0.10
 V1.0.0
 
     1.解决全屏的情况下（状态栏隐藏和虚拟导航栏隐藏的情况），显示状态栏和显示虚拟导航栏的手势冲突的问题
-
     2.优化滑动过程中的缩放比例
