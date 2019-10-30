@@ -62,7 +62,7 @@ public class MainActivity extends BaseActivity {
 
         adapter.setOnItemClickListener((adapter, view, position) -> {
             updateIndex = position;
-            ActivityOptionsCompat compat = ActivityOptionsCompat.makeSceneTransitionAnimation(MainActivity.this, view.findViewById(R.id.rv_item_photo_iv), "share_photo");
+            ActivityOptionsCompat compat = ActivityOptionsCompat.makeSceneTransitionAnimation(MainActivity.this, view.findViewById(R.id.rv_item_fake_iv), "share_photo");
             Intent intent = new Intent();
             intent.putExtra("index", updateIndex);
             intent.setClass(MainActivity.this, ImageViewPreviewActivity.class);
@@ -95,7 +95,7 @@ public class MainActivity extends BaseActivity {
                 //sharedElements 本页面指定共享元素动画的view
                 Log.d("test exit a", "onMapSharedElements");
                 //更新共享元素键值对
-                View view = adapter.getViewByPosition(photosRv, updateIndex, R.id.rv_item_photo_iv);
+                View view = adapter.getViewByPosition(photosRv, updateIndex, R.id.rv_item_fake_iv);
                 if (view != null) {
                     sharedElements.put("share_photo", view);
                 }
@@ -105,6 +105,7 @@ public class MainActivity extends BaseActivity {
             public Parcelable onCaptureSharedElementSnapshot(View sharedElement, Matrix viewToGlobalMatrix, RectF screenBounds) {
                 //sharedElement 本页面指定共享元素动画的view
                 Log.d("test exit a", "onCaptureSharedElementSnapshot");
+                //以下代码已经没必要设置，因为demo中的动画效果已经全部设置在了rv_item_fake_iv上
                 //解决执行共享元素动画的时候，一开始显示空白的问题
                 sharedElement.setAlpha(1f);
                 return super.onCaptureSharedElementSnapshot(sharedElement, viewToGlobalMatrix, screenBounds);
@@ -134,8 +135,9 @@ public class MainActivity extends BaseActivity {
     @Subscribe(thread = EventThread.MAIN_THREAD, tags = {@Tag("updateView")})
     public void updateView(Integer integer) {
         //此处使用rxbus通知对应的view重新显示出来，解决在滑动返回手指拖动的过程中，看到上一个页面点击的图片显示空白的问题
-        View view = adapter.getViewByPosition(photosRv, integer, R.id.rv_item_photo_iv);
+        View view = adapter.getViewByPosition(photosRv, integer, R.id.rv_item_fake_iv);
         if (view != null) {
+            //以下代码已经没必要设置，因为demo中的动画效果已经全部设置在了rv_item_fake_iv上
             view.setAlpha(1f);
         }
     }

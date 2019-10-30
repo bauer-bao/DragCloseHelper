@@ -16,7 +16,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.ImageView;
 
 import com.dragclosehelper.library.DragCloseHelper;
 import com.github.chrisbanes.photoview.PhotoView;
@@ -65,7 +64,6 @@ public class ImageViewPreviewActivity extends BaseActivity {
             PhotoView imageView = new PhotoView(this);
             imageView.setImageResource(photoList.get(i));
             imageView.setAdjustViewBounds(true);
-            imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             list.add(imageView);
         }
 

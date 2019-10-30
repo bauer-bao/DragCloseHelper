@@ -7,11 +7,17 @@ import android.content.Context;
 
 import androidx.annotation.FloatRange;
 
+import android.content.res.Resources;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
+import android.view.WindowManager;
 import android.view.animation.LinearInterpolator;
+
+import java.lang.reflect.Method;
 
 /**
  * @author bauer on 2019/4/17.
@@ -40,7 +46,7 @@ public class DragCloseHelper {
     /**
      * 上次触摸坐标
      */
-    private float mLastY, mLastRawY, mLastX, mLastRawX;
+    private float mLastY = -1, mLastRawY = -1, mLastX = -1, mLastRawX = -1;
     /**
      * 上次触摸手指id
      */
@@ -62,6 +68,16 @@ public class DragCloseHelper {
      */
     private boolean isShareElementMode = false;
 
+    /**
+     * 状态栏高度
+     */
+    private int statusBarHeight;
+
+    /**
+     * 屏幕高度
+     */
+    private int screenDpi;
+
     private View parentV, childV;
 
     private DragCloseListener dragCloseListener;
@@ -80,6 +96,8 @@ public class DragCloseHelper {
     public DragCloseHelper(Context mContext) {
         this.mContext = mContext;
         viewConfiguration = ViewConfiguration.get(mContext);
+        statusBarHeight = getStatusBarHeight(mContext);
+        screenDpi = getDpi(mContext);
     }
 
     public void setDragCloseListener(DragCloseListener dragCloseListener) {
@@ -158,7 +176,7 @@ public class DragCloseHelper {
      */
     public boolean handleEvent(MotionEvent event) {
         if (dragCloseListener != null && dragCloseListener.intercept()) {
-            //拦截
+            //被接口中的方法拦截
             log("action dispatch--->");
             isSwipingToClose = false;
             return false;
@@ -166,15 +184,31 @@ public class DragCloseHelper {
             //不拦截
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 log("action down--->");
+                reset(event);
+                mLastY = event.getY();
+                mLastX = event.getX();
+                mLastRawY = event.getRawY();
+                mLastRawX = event.getRawX();
+                if (isInvalidTouch()) {
+                    //触摸点在状态栏的区域 或者 是无效触摸区域，则需要拦截
+                    return true;
+                }
                 //开始按
                 isPress = true;
                 //开始延迟
                 checkForLongClick();
                 //初始化数据
                 lastPointerId = event.getPointerId(0);
-                reset(event);
             } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
                 log("action move--->" + event.getPointerCount() + "---" + isSwipingToClose);
+                if (isInvalidTouch()) {
+                    //无效触摸区域，则需要拦截
+                    return true;
+                }
+                if (mLastRawY == -1) {
+                    //解决触摸底部，部分有虚拟导航栏的手机会出现先move后down的问题，因此up和cancel的时候需要重置为-1
+                    return true;
+                }
                 if (event.getPointerCount() > 1) {
                     //如果有多个手指
                     if (isSwipingToClose) {
@@ -220,7 +254,7 @@ public class DragCloseHelper {
                     //已经开始，更新view
                     mCurrentTranslationY = currentRawY - mLastRawY + mLastTranslationY;
                     mCurrentTranslationX = currentRawX - mLastRawX + mLastTranslationX;
-                    float percent = 1 - Math.abs(mCurrentTranslationY / (maxExitY + childV.getHeight()));
+                    float percent = 1 - Math.abs(mCurrentTranslationY / childV.getHeight());
                     if (percent > 1) {
                         percent = 1;
                     } else if (percent < 0) {
@@ -230,17 +264,26 @@ public class DragCloseHelper {
                     if (dragCloseListener != null) {
                         dragCloseListener.dragging(percent);
                     }
-                    childV.setTranslationY(mCurrentTranslationY);
-                    childV.setTranslationX(mCurrentTranslationX);
                     if (percent < minScale) {
                         percent = minScale;
                     }
+                    if (mCurrentTranslationY > 0) {
+                        childV.setTranslationY(mCurrentTranslationY - (childV.getHeight() - maxExitY) * (1 - percent) / 2);
+                    } else {
+                        childV.setTranslationY(mCurrentTranslationY + (childV.getHeight() - maxExitY) * (1 - percent) / 2);
+                    }
+                    childV.setTranslationX(mCurrentTranslationX);
                     childV.setScaleX(percent);
                     childV.setScaleY(percent);
                     return true;
                 }
             } else if (event.getAction() == MotionEvent.ACTION_UP) {
                 log("action up--->" + isSwipingToClose);
+                if (isInvalidTouch()) {
+                    //无效触摸区域，则需要拦截
+                    return true;
+                }
+                mLastRawY = -1;
                 if (isPress) {
                     if (!longClickPerform) {
                         //长按没有处理，开始执行单击
@@ -277,6 +320,7 @@ public class DragCloseHelper {
                 //结束了按的状态
                 isPress = false;
                 longClickPerform = false;
+                mLastRawY = -1;
                 if (isSwipingToClose) {
                     resetCallBackAnimation();
                     isSwipingToClose = false;
@@ -333,10 +377,10 @@ public class DragCloseHelper {
      */
     private void reset(MotionEvent event) {
         isSwipingToClose = false;
-        mLastY = event.getY();
-        mLastX = event.getX();
-        mLastRawY = event.getRawY();
-        mLastRawX = event.getRawX();
+        mLastY = -1;
+        mLastX = -1;
+        mLastRawY = -1;
+        mLastRawX = -1;
         mLastTranslationY = 0;
         mLastTranslationX = 0;
     }
@@ -345,13 +389,17 @@ public class DragCloseHelper {
      * 更新缩放的view
      */
     private void updateChildView(float transX, float transY) {
-        childV.setTranslationY(transY);
-        childV.setTranslationX(transX);
-        float percent = Math.abs(transY / (maxExitY + childV.getHeight()));
+        float percent = Math.abs(transY / childV.getHeight());
         float scale = 1 - percent;
         if (scale < minScale) {
             scale = minScale;
         }
+        if (transY > 0) {
+            childV.setTranslationY(transY - (childV.getHeight() - maxExitY) * (1 - scale) / 2);
+        } else {
+            childV.setTranslationY(transY + (childV.getHeight() - maxExitY) * (1 - scale) / 2);
+        }
+        childV.setTranslationX(transX);
         childV.setScaleX(scale);
         childV.setScaleY(scale);
     }
@@ -469,5 +517,52 @@ public class DragCloseHelper {
          * 点击事件
          */
         void onClick(View view, boolean isLongClick);
+    }
+
+    /**
+     * 是否有效点击，如果点击到了状态栏区域 或者 虚拟导航栏区域，则无效
+     *
+     * @return
+     */
+    private boolean isInvalidTouch() {
+        return mLastRawY < statusBarHeight || mLastRawY > screenDpi - 2 * statusBarHeight;
+    }
+
+    /**
+     * 获取状态栏的高度
+     *
+     * @param context
+     * @return
+     */
+    private int getStatusBarHeight(Context context) {
+        int statusBarHeight = 0;
+        Resources res = context.getResources();
+        int resourceId = res.getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            statusBarHeight = res.getDimensionPixelSize(resourceId);
+        }
+        return statusBarHeight;
+    }
+
+    /**
+     * 获取屏幕原始尺寸高度，包括虚拟功能键高度
+     */
+    public int getDpi(Context context) {
+        int dpi = 0;
+        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        Display display = windowManager.getDefaultDisplay();
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        @SuppressWarnings("rawtypes")
+        Class c;
+        try {
+            c = Class.forName("android.view.Display");
+            @SuppressWarnings("unchecked")
+            Method method = c.getMethod("getRealMetrics", DisplayMetrics.class);
+            method.invoke(display, displayMetrics);
+            dpi = displayMetrics.heightPixels;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return dpi;
     }
 }
