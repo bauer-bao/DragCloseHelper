@@ -22,7 +22,7 @@
         			maven { url 'https://jitpack.io' }
         		}
         	}
-        implementation 'com.github.bauer-bao:dragclosehelper:1.0.0'
+        implementation 'com.github.bauer-bao:dragclosehelper:1.0.1'
 
 1.activity主题设为透明
 
@@ -91,13 +91,15 @@
         setMinScale(@FloatRange(from = 0.1f, to = 1.0f) float minScale)
 
 ## 常见问题：
+0.如果发现问题，欢迎提issue。如果issue没法及时解决，欢迎直接复制 + 黏贴 + 修改。
+
 1.是否支持在fragment中使用
 
-    不支持
+    不支持，可以将fragment层当做childview来处理
 
 2.滑动关闭的过程中（手指脱离屏幕），view会显示在虚拟导航栏上
 
-    参照微信，使用如下代码
+    使用如下代码，效果参考微信
     //隐藏状态栏
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
     //透明导航栏
@@ -144,24 +146,30 @@
     效果和微信朋友圈类似，不需要设置上面问题3和问题4的代码
 
 ## 更新日志：
-V0.0.7
 
-    1.新建项目
+V1.0.1
+
+    1.可放大图片的场景下，解决在放大状态下点击和长按事件失效的问题
+    2.可放大图片的场景下，解决没法双指手势放大的问题
+
+V1.0.0
+
+    1.解决全屏的情况下（状态栏隐藏和虚拟导航栏隐藏的情况），显示状态栏和显示虚拟导航栏的手势冲突的问题
+    2.优化滑动过程中的缩放比例
+
+V0.0.10
+
+    1.添加单击和长按事件监听
+
+V0.0.9
+
+    1.优化在viewpager中使用的体验
 
 V0.0.8
 
     1.添加对cancel的处理
     2.appcompat依赖修改为compileOnly
 
-V0.0.9
+V0.0.7
 
-    1.优化在viewpager中使用的体验
-
-V0.0.10
-
-    1.添加单击和长按事件监听
-
-V1.0.0
-
-    1.解决全屏的情况下（状态栏隐藏和虚拟导航栏隐藏的情况），显示状态栏和显示虚拟导航栏的手势冲突的问题
-    2.优化滑动过程中的缩放比例
+    1.新建项目

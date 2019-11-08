@@ -119,7 +119,7 @@ public class ImageViewPreviewActivity extends BaseActivity {
             @Override
             public boolean intercept() {
                 //默认false 不拦截 如果图片是放大状态，或者处于滑动返回状态，需要拦截
-                return scrolling;
+                return scrolling || ((PhotoView) list.get(viewPager.getCurrentItem())).getScale() != 1;
             }
 
             @Override

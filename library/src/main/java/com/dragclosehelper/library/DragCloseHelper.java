@@ -169,15 +169,65 @@ public class DragCloseHelper {
     }
 
     /**
+     * 重置点击事件
+     */
+    private void resetClickEvent() {
+        parentV.removeCallbacks(longClickRunnable);
+        isPress = false;
+        longClickPerform = false;
+    }
+
+    /**
+     * 处理点击事件
+     */
+    private void dealClickEvent() {
+        if (isPress) {
+            if (!longClickPerform) {
+                //长按没有处理，开始执行单击
+                parentV.removeCallbacks(longClickRunnable);
+                if (clickListener != null) {
+                    clickListener.onClick(childV, false);
+                }
+            }
+            //结束了按的状态
+            isPress = false;
+        }
+    }
+
+    /**
      * 处理touch事件
      *
      * @param event
      * @return
      */
     public boolean handleEvent(MotionEvent event) {
-        if (dragCloseListener != null && dragCloseListener.intercept()) {
-            //被接口中的方法拦截
+        if (event.getPointerCount() > 1) {
+            //如果有多个手指
+            if (isSwipingToClose) {
+                //已经开始滑动关闭，恢复原状，否则需要派发事件
+                isSwipingToClose = false;
+                resetCallBackAnimation();
+                return true;
+            }
+            reset(event);
+            resetClickEvent();
+            return false;
+        } else if (dragCloseListener != null && dragCloseListener.intercept()) {
+            //被接口中的方法拦截，但是如果设置了点击事件，将继续执行点击逻辑
             log("action dispatch--->");
+            if (clickListener != null) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    isPress = true;
+                    //开始延迟
+                    checkForLongClick();
+                } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                    //处理事件
+                    dealClickEvent();
+                } else if (event.getAction() == MotionEvent.ACTION_CANCEL) {
+                    //取消事件
+                    resetClickEvent();
+                }
+            }
             isSwipingToClose = false;
             return false;
         } else {
@@ -200,7 +250,7 @@ public class DragCloseHelper {
                 //初始化数据
                 lastPointerId = event.getPointerId(0);
             } else if (event.getAction() == MotionEvent.ACTION_MOVE) {
-                log("action move--->" + event.getPointerCount() + "---" + isSwipingToClose);
+                log("action move--->" + isSwipingToClose + "---" + mLastRawY + "---" + isInvalidTouch());
                 if (isInvalidTouch()) {
                     //无效触摸区域，则需要拦截
                     return true;
@@ -208,17 +258,6 @@ public class DragCloseHelper {
                 if (mLastRawY == -1) {
                     //解决触摸底部，部分有虚拟导航栏的手机会出现先move后down的问题，因此up和cancel的时候需要重置为-1
                     return true;
-                }
-                if (event.getPointerCount() > 1) {
-                    //如果有多个手指
-                    if (isSwipingToClose) {
-                        //已经开始滑动关闭，恢复原状，否则需要派发事件
-                        isSwipingToClose = false;
-                        resetCallBackAnimation();
-                        return true;
-                    }
-                    reset(event);
-                    return false;
                 }
                 if (lastPointerId != event.getPointerId(0)) {
                     //手指不一致，恢复原状
@@ -238,9 +277,7 @@ public class DragCloseHelper {
                     log("action move---> start close");
 
                     //一旦移动，按则取消
-                    isPress = false;
-                    longClickPerform = false;
-                    parentV.removeCallbacks(longClickRunnable);
+                    resetClickEvent();
 
                     float currentRawY = event.getRawY();
                     float currentRawX = event.getRawX();
@@ -284,19 +321,8 @@ public class DragCloseHelper {
                     return true;
                 }
                 mLastRawY = -1;
-                if (isPress) {
-                    if (!longClickPerform) {
-                        //长按没有处理，开始执行单击
-                        parentV.removeCallbacks(longClickRunnable);
-
-                        if (clickListener != null) {
-                            clickListener.onClick(childV, false);
-                        }
-                    }
-                    //结束了按的状态
-                    isPress = false;
-                }
-
+                //处理点击事件
+                dealClickEvent();
                 //手指抬起事件
                 if (isSwipingToClose) {
                     if (mCurrentTranslationY > maxExitY) {
@@ -317,9 +343,7 @@ public class DragCloseHelper {
                 }
             } else if (event.getAction() == MotionEvent.ACTION_CANCEL) {
                 //取消事件
-                //结束了按的状态
-                isPress = false;
-                longClickPerform = false;
+                resetClickEvent();
                 mLastRawY = -1;
                 if (isSwipingToClose) {
                     resetCallBackAnimation();
