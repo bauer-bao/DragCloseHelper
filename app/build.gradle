@@ -24,13 +24,13 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:1.1.0-alpha04'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-alpha4'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0-alpha03'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0-alpha03'
     implementation 'com.hwangjr.rxbus:rxbus:2.0.0'
-//    implementation 'com.github.bauer-bao:dragclosehelper:1.0.0'
+//    implementation 'com.github.bauer-bao:dragclosehelper:1.0.1'
     implementation project(':library')
     implementation 'com.github.CymChad:BaseRecyclerViewAdapterHelper:2.9.34'
     implementation 'com.github.chrisbanes:PhotoView:2.3.0'

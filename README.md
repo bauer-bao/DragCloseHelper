@@ -167,7 +167,7 @@ V0.0.9
 
 V0.0.8
 
-    1.添加对cancel的处理
+    1.添加对ACTION_CANCEL的处理
     2.appcompat依赖修改为compileOnly
 
 V0.0.7
