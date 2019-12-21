@@ -145,6 +145,57 @@
     步骤2.将目标view的共享动画，全部转移设置到fakeView上
     效果和微信朋友圈类似，不需要设置上面问题3和问题4的代码
 
+8.如果用viewpager，可能会出现pointerIndex out of range pointerIndex=-1 pointerCount=1，需要try-catch，或者使用HackyViewPager
+
+    try {
+        if (dragCloseHelper.handleEvent(event)) {
+            return true;
+        } else {
+            return super.dispatchTouchEvent(event);
+        }
+    } catch (IllegalArgumentException e) {
+        e.printStackTrace();
+        return true;
+    }
+
+9.使用ViewPager + com.github.chrisbanes.photoview.PhotoView，vp的左右滑动和pv的缩放存在冲突
+
+    这个属于vp和pv的bug，和本库没有任何关系，可以发现将滑动关闭注释掉之后，依然存在这问题。
+    如果不是com.github.chrisbanes.photoview.PhotoView，则需要自己实现如下对应的方法。
+    处理方法：
+    步骤1.使用自定义HackyViewPager
+    步骤2.photoview.setOnMatrixChangeListener，具体代码如下
+    imageView.setOnMatrixChangeListener(rect -> {
+        //因为demo中此页面是全屏处理，所以需要获取整个屏幕的宽度（包括横屏的时候虚拟按键的宽度），如果非全屏，自己更改此处的宽度
+        int screenW = ScreenUtil.getWidthDpi(this);
+        /**
+         * 因为发现加载完成之后，matrix会和正常情况有误差，所以需要获取误差值，此处取系统误差值getScaledTouchSlop
+         * 但是getScaledTouchSlop默认是8*系统密度，所以可以根据自己需求去设定
+         *
+         * 同时scale也会存在一定的误差，正常情况下可能在0.99-1.01之间
+         */
+        int delta = ViewConfiguration.get(this).getScaledTouchSlop() / 2;
+        if (rect.width() < screenW) {
+            //预览的时候，图片左右边界小于屏幕宽度 --> 此处存在三种情况，正常+缩小+放大（图片宽度还处于小于屏幕宽度的时候）
+            if (imageView.getScale() < 0.99 || imageView.getScale() > 1.01) {
+                //getscale会存在误差，如果是缩小或者放大状态，拦截vp的事件
+                viewPager.setLocked(true);
+            } else {
+                //属于正常状态，可以左右滑动
+                viewPager.setLocked(false);
+            }
+        } else {
+            //预览的时候，大于或者等于屏幕宽度 --> 对应的情况，正常 + 放大
+            if (Math.abs(rect.left - 0) <= delta || Math.abs(rect.right - screenW) <= delta) {
+                //图片的左右边界，在误差范围内 --> 对应情况，正常 + 放大（图片拖拽到边界）
+                viewPager.setLocked(false);
+            } else {
+                //放大，没拖拽到边界
+                viewPager.setLocked(true);
+            }
+        }
+    });
+
 ## 更新日志：
 
 V1.0.1

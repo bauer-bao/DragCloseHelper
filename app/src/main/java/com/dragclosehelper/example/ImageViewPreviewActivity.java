@@ -3,19 +3,19 @@ package com.dragclosehelper.example;
 import android.app.SharedElementCallback;
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Parcelable;
+import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewConfiguration;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.viewpager.widget.PagerAdapter;
 import androidx.viewpager.widget.ViewPager;
-
-import android.os.Parcelable;
-import android.util.Log;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowManager;
 
 import com.dragclosehelper.library.DragCloseHelper;
 import com.github.chrisbanes.photoview.PhotoView;
@@ -30,7 +30,7 @@ import java.util.Map;
  */
 public class ImageViewPreviewActivity extends BaseActivity {
     private ConstraintLayout ivPreviewCl;
-    private ViewPager viewPager;
+    private HackyViewPager viewPager;
 
     private List<View> list;
 
@@ -64,6 +64,42 @@ public class ImageViewPreviewActivity extends BaseActivity {
             PhotoView imageView = new PhotoView(this);
             imageView.setImageResource(photoList.get(i));
             imageView.setAdjustViewBounds(true);
+            /**
+             * viewpager左右滑动 + photoview缩放之间本身就存在着冲突，需要额外处理。
+             * 此处使用自定义的vp，同时以com.github.chrisbanes.photoview.PhotoView为例，如果非此photoview，请自己实现对应的matrix方法
+             * 思路：需要保证，1.图片缩小的情况下，vp没法左右滑动，2.图片正常的情况下，可以左右滑动，3.图片放大的情况下，在图片拖拽到边界的时候，可以左右滑动
+             * 代码为了可读性，没有将ifelse进行合并处理
+             */
+            imageView.setOnMatrixChangeListener(rect -> {
+                //因为demo中此页面是全屏处理，所以需要获取整个屏幕的宽度（包括横屏的时候虚拟按键的宽度），如果非全屏，自己更改此处的宽度
+                int screenW = ScreenUtil.getWidthDpi(this);
+                /**
+                 * 因为发现加载完成之后，matrix会和正常情况有误差，所以需要获取误差值，此处取系统误差值getScaledTouchSlop
+                 * 但是getScaledTouchSlop默认是8*系统密度，所以可以根据自己需求去设定
+                 *
+                 * 同时scale也会存在一定的误差，正常情况下可能在0.99-1.01之间
+                 */
+                int delta = ViewConfiguration.get(this).getScaledTouchSlop() / 2;
+                if (rect.width() < screenW) {
+                    //预览的时候，图片左右边界小于屏幕宽度 --> 此处存在三种情况，正常+缩小+放大（图片宽度还处于小于屏幕宽度的时候）
+                    if (imageView.getScale() < 0.99 || imageView.getScale() > 1.01) {
+                        //getscale会存在误差，如果是缩小或者放大状态，拦截vp的事件
+                        viewPager.setLocked(true);
+                    } else {
+                        //属于正常状态，可以左右滑动
+                        viewPager.setLocked(false);
+                    }
+                } else {
+                    //预览的时候，大于或者等于屏幕宽度 --> 对应的情况，正常 + 放大
+                    if (Math.abs(rect.left - 0) <= delta || Math.abs(rect.right - screenW) <= delta) {
+                        //图片的左右边界，在误差范围内 --> 对应情况，正常 + 放大（图片拖拽到边界）
+                        viewPager.setLocked(false);
+                    } else {
+                        //放大，没拖拽到边界
+                        viewPager.setLocked(true);
+                    }
+                }
+            });
             list.add(imageView);
         }
 
@@ -119,7 +155,8 @@ public class ImageViewPreviewActivity extends BaseActivity {
             @Override
             public boolean intercept() {
                 //默认false 不拦截 如果图片是放大状态，或者处于滑动返回状态，需要拦截
-                return scrolling || ((PhotoView) list.get(viewPager.getCurrentItem())).getScale() != 1;
+                float scale = ((PhotoView) list.get(viewPager.getCurrentItem())).getScale();
+                return scrolling || (scale < 0.99 || scale > 1.01);
             }
 
             @Override
