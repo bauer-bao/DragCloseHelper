@@ -2,6 +2,10 @@
 
 [![](https://jitpack.io/v/bauer-bao/dragclosehelper.svg)](https://jitpack.io/#bauer-bao/dragclosehelper)
 
+## 介绍：
+
+本库只对预览页面做了滑动动画的封装处理，转场动画还是基于共享元素实现
+
 ## 效果图：
 
 1.demo效果
